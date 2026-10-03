@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+.env
+.env.local
+*.log
+.vercel
+
+# Private project notes: name garden members and adoption strategy.
+# This repo is public (GitHub Pages), so these stay local only.
+HANDOFF.md
+CLAUDE.md
+docs/
+.claude/

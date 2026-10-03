@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Bed by Bed</title>
+<style>
+  :root{
+    --bg:#faf8f4; --surface:#ffffff; --ink:#1f2420; --muted:#6b7269;
+    --line:#e3e0d8; --accent:#2f4f34; --accent-soft:#eaf0e9; --flag:#9a5b12; --flag-soft:#fbf0dc;
+    --legume:#4f7a3a; --allium:#7a5c9e; --brassica:#2f6f8f; --roots:#b06a24; --odds:#7a6a58;
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141714; --surface:#1d211d; --ink:#eceee9; --muted:#9aa197;
+      --line:#2e332e; --accent:#9ec79a; --accent-soft:#232a23; --flag:#e0b070; --flag-soft:#2c2416;
+      --legume:#8fbf74; --allium:#b79bd8; --brassica:#6db4d6; --roots:#dc9a55; --odds:#b3a390;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141714; --surface:#1d211d; --ink:#eceee9; --muted:#9aa197;
+    --line:#2e332e; --accent:#9ec79a; --accent-soft:#232a23; --flag:#e0b070; --flag-soft:#2c2416;
+    --legume:#8fbf74; --allium:#b79bd8; --brassica:#6db4d6; --roots:#dc9a55; --odds:#b3a390;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+       padding-inline:16px;padding-block:0 40px;-webkit-text-size-adjust:100%}
+  .wrap{max-width:1040px;margin:0 auto}
+  header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);
+         padding-block:14px 10px;border-bottom:1px solid var(--line)}
+  h1{font-size:19px;margin:0;letter-spacing:-.01em}
+  h1 span{color:var(--muted);font-weight:400}
+  .lede{color:var(--muted);font-size:13px;margin:2px 0 10px;max-width:65ch}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font:inherit;font-size:13px;font-weight:600;padding:6px 11px;border-radius:999px;cursor:pointer;
+        border:1px solid var(--line);background:var(--surface);color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+  .chip i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted));display:inline-block}
+  .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+  .chip[aria-pressed="true"] i{box-shadow:0 0 0 1.5px var(--bg)}
+  .chip .ct{font-weight:500;opacity:.75;font-variant-numeric:tabular-nums}
+  input[type=search]{flex:1 1 180px;min-width:0;font:inherit;font-size:14px;padding:7px 12px;border-radius:10px;
+        border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .missing{margin:14px 0 4px;font-size:13px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .missing b{font-weight:600;color:var(--ink)}
+  .gap{border:1px dashed var(--line);border-radius:8px;padding:1px 9px;font-variant-numeric:tabular-nums}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:12px;margin-top:12px;align-items:start}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px}
+  .head{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+  .num{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+  .fam{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c);display:inline-flex;align-items:center;gap:6px}
+  .fam::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 2px}
+  .row{display:flex;gap:9px;padding:6px 0;border-top:1px solid var(--line);align-items:baseline}
+  .row:first-of-type{border-top:0}
+  .sec{flex:0 0 auto;min-width:30px;height:20px;padding:0 6px;border-radius:6px;background:var(--accent-soft);color:var(--accent);
+       font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.04em}
+  .sec.none{background:transparent;color:var(--muted);font-weight:500}
+  .crop{flex:1;font-weight:550;font-size:15px}
+  .crop small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+  .when{color:var(--muted);font-size:12.5px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  details{margin-top:6px}
+  summary{cursor:pointer;font-size:13px;color:var(--muted);padding:4px 0}
+  .ops{font-size:13px;color:var(--muted);margin:8px 0 0}
+  .ops b{color:var(--ink);font-weight:600}
+  .flag{margin:10px 0 0;padding:7px 10px;border-radius:9px;background:var(--flag-soft);color:var(--flag);font-size:12.5px;line-height:1.4}
+  .none-found{color:var(--muted);padding:30px 0;text-align:center}
+  footer{margin-top:26px;font-size:12.5px;color:var(--muted);max-width:70ch}
+  footer p{margin:0 0 6px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Marra Guwiyap <span>— bed by bed</span></h1>
+    <p class="lede">What the planting binder says is in each bed. <b>N</b>/<b>S</b>/<b>E</b>/<b>W</b> is the half <i>within</i> a bed, not the garden's zones. Dates are day/month, 2026 unless marked.</p>
+    <div class="controls">
+      <div class="chips" id="chips" role="group" aria-label="Filter by rotation family"></div>
+      <input type="search" id="q" placeholder="Search a crop, e.g. beetroot" aria-label="Search crops">
+    </div>
+  </header>
+
+  <div class="missing">
+    <b>No binder page photographed:</b>
+    <span class="gap">Bed 1</span><span class="gap">Bed 17</span><span class="gap">Bed 18</span><span class="gap">Bed 28</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="none-found" id="empty" hidden>No beds match.</div>
+
+  <footer>
+    <p>Transcribed from the paper binder (docs 03 and 04), not read live from the database. <b>[?]</b> marks a reading the transcription flagged as uncertain.</p>
+    <p>Family labels are the team's own, not botanical: lettuce and spinach are filed as brassica, sweetcorn and cucumber as roots and fruits.</p>
+  </footer>
+</div>
+
+<script>
+var FAM = {
+  legumes:{name:"Legumes",c:"var(--legume)"}, alliums:{name:"Alliums",c:"var(--allium)"},
+  brassica:{name:"Brassica",c:"var(--brassica)"}, roots:{name:"Roots + Fruits",c:"var(--roots)"},
+  odds:{name:"Odds + Ends",c:"var(--odds)"}
+};
+var OFF = "Brassica planted in a non-brassica bed. The database notes flag this; it may be deliberate gap-filling. A question for the Planting team.";
+// [crop, half, when, note]
+var BEDS = [
+ {n:2,f:"legumes",now:[["Broad beans","S/N","8/3","4 plants per half after top-up 22/3"]],
+  before:[["Butternut pumpkin","","","self-seeded"]],ops:"Worm tea 19/7"},
+ {n:3,f:"alliums",now:[["Garlic","N/S","27/4 [?]"]],
+  before:[["Gai lan","N/S","22/3","harvested"],["Cos lettuce","N","12/2 [?]"]],ops:"Worm tea 31/5, 19/7, 2/8. Compost mixed through 19/4. Extra mulch."},
+ {n:4,f:"legumes",now:[["Broad beans","S/N","8/3","more added 22/3; filled in after squash 8/4 [?]"]],
+  before:[["Butternut squash","N","","harvested"]],ops:"Worm tea 19/6 [?]"},
+ {n:5,f:"alliums",now:[["Spinach","N","26/7","4 seedlings, one row at the southern end"]],
+  before:[["Mustard greens","N","8/2","harvested"],["Cos lettuce","S","1/2"]],
+  plan:"Onion or spring onion (S, low nutrient need) 29/3",ops:"Mulched, greens picked 19/7",flag:OFF},
+ {n:6,f:"legumes",now:[["Peas","N/S","7/6","tied up 19/7"],["Cos lettuce","N","2/8"],["Radishes","N/S","19/7","spread"]],
+  before:[["Corn, beans, zucchini","N/S","14/9"],["Beans","","","self-seeded"],["Soy beans","","","?"]],flag:OFF},
+ {n:7,f:"roots",now:[["Mini cabbage","S","5/4"],["Beetroot","N","29/3","a few harvested 19/7"]],
+  before:[["Zucchini + eggplant","N/S","Oct"],["Cucumbers","","","?"]],ops:"Snail pellets 28/6 and 19/7. Cabbage sprayed 28/6.",
+  flag:"Cabbage is a full-season brassica in a roots + fruits bed. Looks different in kind from the quick-green gap-fillers elsewhere."},
+ {n:8,f:"brassica",now:[["Cavolo nero (kale)","S","5/7"],["Silverbeet","","28/6"],["Bok choi","",""],["Cabbage","","","filled in"]],
+  before:[["Broccoletti","S","22/2, 22/3"],["Broccoli","N","11/1","seeds"],["Squash","N/S","9/11/25","harvested"]],
+  plan:"Kohlrabi (S)",ops:"Broccoli sprayed with eco oil 26/4. Composted 5/7."},
+ {n:9,f:"roots",now:[["Beetroot","S","24/5 [?]","added 19/7"],["Parsnips","N","13/4","more seed 7/6, recorded NE [?]"],["Radishes","N","5/4","west half"]],
+  before:[["Corn, beans, cucumbers","N","19/10/25 [?]"],["Fennel","S","19/10/25","kept for seed"]],
+  flag:"Bed column says N, but the radish note says west half. N/S and E/W may both be in use here."},
+ {n:10,f:"brassica",now:[["Tatsoi","N","28/6"],["Pak choy","","19/7"],["Cavolo nero","",""]],
+  before:[["Broccoletti","N/S","22/2"],["Rainbow chard","N/S","19/10/25","died off 7/6"]],plan:"Broccoletti + mini cauliflower"},
+ {n:11,f:"roots",now:[["Spinach","N","26/4 [?]","after compost + manure"],["Fennel","S","22/2","one harvested"]],
+  before:[["Capsicum + chilli","N","9/11/25","harvested, plants removed 19/7 [?]"]],plan:"Carrots (N)?",
+  flag:"The last two rows on this page may be in reversed date order. Spinach is a brassica-family gap-filler here."},
+ {n:12,f:"brassica",now:[["Bok choy","S","7/6","seeds"],["Turnip","N","7/6","seeds"]],
+  before:[["Brussels sprouts","S","1/2"],["Celery","N","2/11","struck through"]],
+  ops:"Sprayed for aphids + mildew 9/5. Compost, rest 3 weeks 10/5. Eco oil 28/6. Mulched 19/7.",
+  flag:"The 24/5 plan put bok choy in N and turnip in S, but the 7/6 sowing has them swapped. Also near-identical to bed 24."},
+ {n:13,f:"odds",now:[["Kohlrabi","E","7/6"],["Radish + kohlrabi","W","7/6"]],
+  before:[["Cherry tomatoes, bush beans","","1/2"],["Redwin [?] seedling","","26/4"]],ops:"Snail pellets 28/6. Mulched 19/7."},
+ {n:14,f:"alliums",now:[["Leeks","E/W","22/2","selectively harvested 19/7"],["Cos lettuce","W","2/8"]],
+  before:[["Radish","","","struck through"],["Bush beans","","","struck through"]],plan:"Radish + lettuce",flag:OFF},
+ {n:15,f:"odds",now:[["Eggplants","","22/4/25 [?]"]],before:[["Tomatoes + basil","","19/10"]],
+  plan:"Celery + radish (S)",ops:"Resting after compost 19/4. Snail pellets 28/6."},
+ {n:16,f:"roots",now:[["Silverbeet + rocket","W/E","15/4"],["Kohlrabi","W/E","29/3","large ones harvested 19/7"],["Beetroot","W","8/2"]],
+  ops:"Snail pellets + eco oil 28/6",flag:"Two current plantings here sit outside the bed's family (database notes)."},
+ {n:19,f:"odds",now:[["Turnips","N","26/3","selectively harvested 19/7"],["Peas","S","8/3","tied 19/7"]],
+  before:[["Fennel for seed","N","30/11/25","harvested"],["Silverbeet","","","struck through"]]},
+ {n:20,f:"odds",now:[["Beetroot","S / N","17/5, 31/5"],["Chilli","","","pruned, mulched 19/7"]],
+  before:[["Tomatoes + jalapeños","N/S","6/11/25"]],plan:"Keep one jalapeño; compost + rest 2 weeks"},
+ {n:21,f:"legumes",now:[],before:[["Corn, beans, cucumbers","",""]],plan:"Broad beans (N/S) 5/4, replacing beetroot"},
+ {n:22,f:"brassica",now:[["Pak choy + kailan","22 [?]","19/6","seedlings"],["Turnip","S","8/2","seedlings"]],
+  before:[["Gold nugget pumpkins","N","Oct"]],plan:"Green manure + cauliflower 19/4; then spinach + radish",
+  flag:"The half for the pak choy row is unreadable: the page says '22 [?]'."},
+ {n:23,f:"legumes",now:[["Daikon radish","","19/7","seeds"],["Snow peas","","28/6","seedlings"],["Broad beans","N/S","7/6","seeds"],["Bush beans","N/S","8/2"]]},
+ {n:24,f:"brassica",now:[["Wombok","N/S","31/5"]],
+  before:[["Brussels sprouts","S, N","1/2, 22/3"],["Celery","N","2/11","struck through"]],
+  ops:"Sprayed for mildew + aphids 9/5. Compost, rest 3 weeks 17/5.",
+  flag:"History is nearly identical to bed 12 (same celery, sprouts, spray and rest dates). Confirm two parallel beds, not a duplicated page."},
+ {n:25,f:"odds",now:[["Carrots","","24/5","+ seeds 26/7"]],before:[["Truss tomatoes","","9/11"],["Radish","","8/2"]],ops:"Mulched"},
+ {n:26,f:"alliums",now:[["Bok choy","S","5/4","seedlings"]],
+  before:[["Thai chilli","N","1/3","harvested and pruned 19/7"],["Bok choy","N","22/3","harvested"]],
+  plan:"Shallots + leeks 24/5",flag:OFF},
+ {n:27,f:"roots",now:[["Beetroot","","14/6"]],before:[["Tomatoes + basil","","22/11"],["Passion fruit","",""]],
+  plan:"Compost + rest; parsnips (direct sow), celery",ops:"Worm tea + mulch 19/7"},
+ {n:29,f:"roots",now:[["Fennel","29 [?]","7/6"]],before:[["Capsicums","","7/12"],["Tomatoes","","22/11"]]}
+];
+
+var state = {fam:null,q:""};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function rows(list){
+  return list.map(function(r){
+    var half = r[1] ? '<span class="sec">'+esc(r[1])+'</span>' : '<span class="sec none">–</span>';
+    return '<div class="row">'+half+'<div class="crop">'+esc(r[0])+(r[3]?'<small>'+esc(r[3])+'</small>':'')+'</div><span class="when">'+esc(r[2]||"")+'</span></div>';
+  }).join("");
+}
+function text(b){
+  var all=[].concat(b.now||[],b.before||[]).map(function(r){return r.join(" ")}).join(" ");
+  return (all+" "+(b.plan||"")+" "+(b.ops||"")).toLowerCase();
+}
+function render(){
+  var grid=document.getElementById("grid"), out=[];
+  BEDS.forEach(function(b){
+    if(state.fam && b.f!==state.fam) return;
+    if(state.q && text(b).indexOf(state.q)<0) return;
+    var f=FAM[b.f], h='<article class="card" style="--c:'+f.c+'"><div class="head"><span class="num">'+b.n+'</span><span class="fam">'+f.name+'</span></div>';
+    if(b.now && b.now.length){h+='<div class="label">Latest</div>'+rows(b.now)}
+    else h+='<div class="label">Latest</div><div class="ops">Nothing recorded after the first planting.</div>';
+    if(b.before && b.before.length) h+='<details><summary>Earlier ('+b.before.length+')</summary>'+rows(b.before)+'</details>';
+    if(b.plan) h+='<p class="ops"><b>Planned:</b> '+esc(b.plan)+'</p>';
+    if(b.ops) h+='<p class="ops"><b>Care:</b> '+esc(b.ops)+'</p>';
+    if(b.flag) h+='<p class="flag">'+esc(b.flag)+'</p>';
+    out.push(h+'</article>');
+  });
+  grid.innerHTML=out.join("");
+  document.getElementById("empty").hidden = out.length>0;
+}
+function chips(){
+  var box=document.getElementById("chips"), keys=Object.keys(FAM), h='';
+  h+='<button class="chip" type="button" data-f="" aria-pressed="true">All <span class="ct">'+BEDS.length+'</span></button>';
+  keys.forEach(function(k){
+    var n=BEDS.filter(function(b){return b.f===k}).length;
+    h+='<button class="chip" type="button" data-f="'+k+'" aria-pressed="false" style="--c:'+FAM[k].c+'"><i></i>'+FAM[k].name+' <span class="ct">'+n+'</span></button>';
+  });
+  box.innerHTML=h;
+  box.addEventListener("click",function(e){
+    var t=e.target.closest(".chip"); if(!t) return;
+    state.fam=t.dataset.f||null;
+    [].forEach.call(box.children,function(c){c.setAttribute("aria-pressed",c===t?"true":"false")});
+    render();
+  });
+}
+document.getElementById("q").addEventListener("input",function(e){state.q=e.target.value.trim().toLowerCase();render()});
+chips();render();
+</script>
+</body>
+</html>

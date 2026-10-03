@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f4f34">
+<meta name="robots" content="noindex">
+<title>Marra Guwiyap — Planting Book</title>
+<style>
+  :root{
+    --bg:#faf8f4; --surface:#fff; --ink:#1f2420; --muted:#6b7269;
+    --line:#e3e0d8; --accent:#2f4f34; --accent-soft:#eaf0e9;
+    --legume:#4f7a3a; --allium:#7a5c9e; --brassica:#2f6f8f;
+    --roots:#b06a24; --odds:#7a6a58;
+    --grass:#eef3ea; --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#141714; --surface:#1d211d; --ink:#eceee9; --muted:#9aa197;
+           --line:#2e332e; --accent:#9ec79a; --accent-soft:#232a23; --grass:#1a1f19; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-text-size-adjust:100%; padding:0 0 env(safe-area-inset-bottom);
+  }
+  header{position:sticky;top:0;z-index:10;background:var(--bg);padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+  h1{font-size:17px;margin:0;letter-spacing:-.01em}
+  h1 span{color:var(--muted);font-weight:400}
+  main{padding:14px 16px 40px;max-width:680px;margin:0 auto}
+  .tabs{display:flex;gap:6px;margin-top:10px}
+  .tabs button{flex:1;padding:9px 8px;font:inherit;font-size:14px;font-weight:600;
+    border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:10px;cursor:pointer}
+  .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .seg{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);
+       border-radius:10px;padding:3px;margin-bottom:12px}
+  .seg button{flex:1;padding:7px;font:inherit;font-size:13px;font-weight:600;border:0;
+       background:transparent;color:var(--muted);border-radius:7px;cursor:pointer}
+  .seg button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:0 0 18px}
+  .bed{aspect-ratio:1;border:1px solid var(--line);background:var(--surface);border-radius:12px;
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;font:inherit;color:var(--ink);padding:2px}
+  .bed:active{transform:scale(.97)}
+  .bed b{font-size:17px;font-weight:650}
+  .bed .fam{width:20px;height:3px;border-radius:2px;background:var(--line)}
+  .bed .n{font-size:10px;color:var(--muted)}
+  .bed.empty{opacity:.45}
+  .bed[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+
+  /* map */
+  .mapwrap{background:var(--grass);border:1px solid var(--line);border-radius:var(--radius);
+           padding:10px;margin-bottom:14px;overflow-x:auto}
+  .map{display:grid;gap:6px;min-width:280px}
+  .mbed{border:1px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;
+        color:var(--ink);font:inherit;padding:0;overflow:hidden;display:flex;min-height:46px;position:relative}
+  .mbed[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .mbed.ns{flex-direction:column}
+  .mbed .half{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;
+              font-size:10.5px;color:var(--muted);padding:1px 3px;overflow:hidden;white-space:nowrap}
+  .mbed.ns .half + .half{border-top:1px dashed var(--line)}
+  .mbed:not(.ns) .half + .half{border-left:1px dashed var(--line)}
+  .mbed .num{position:absolute;top:2px;left:4px;font-size:11px;font-weight:700;letter-spacing:-.02em}
+  .mbed .fambar{position:absolute;top:0;right:0;bottom:0;width:3px;background:var(--line)}
+  .mfeat{border-radius:8px;display:flex;align-items:center;justify-content:center;
+         font-size:11px;color:var(--muted);border:1px dashed var(--line);text-align:center;padding:2px;min-height:34px}
+  .mfeat.entrance{border-style:solid;border-color:var(--accent);color:var(--accent);font-weight:700}
+  .compass{font-size:11px;color:var(--muted);text-align:right;margin:-4px 2px 6px}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px;margin-bottom:12px}
+  .card h2{margin:0 0 2px;font-size:19px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:12px}
+  .row{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:baseline}
+  .row:first-of-type{border-top:0}
+  .sec{flex:0 0 auto;min-width:26px;height:22px;padding:0 6px;border-radius:6px;background:var(--accent-soft);
+       color:var(--accent);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;letter-spacing:.04em}
+  .crop{flex:1;font-weight:550}
+  .when{color:var(--muted);font-size:12.5px;text-align:right;white-space:nowrap}
+  .nut{font-size:11px;color:var(--muted);display:block;font-weight:400}
+  .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:650;color:#fff;letter-spacing:.02em}
+  .muted{color:var(--muted)}
+  .empty-note{color:var(--muted);font-style:italic;padding:8px 0}
+  .cols{display:grid;grid-template-columns:1fr;gap:12px}
+  ul.crops{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+  ul.crops li{background:var(--accent-soft);color:var(--ink);padding:4px 10px;border-radius:8px;font-size:14px}
+  ul.crops li.tap{cursor:pointer;border:1px solid transparent}
+  ul.crops li.tap:active{border-color:var(--accent)}
+  .warn{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:6px;padding-top:9px}
+  footer{color:var(--muted);font-size:12px;text-align:center;padding:8px 16px 24px;max-width:680px;margin:0 auto}
+  .spin{color:var(--muted);padding:24px 0;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Marra Guwiyap <span>· planting book</span></h1>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t-beds" aria-selected="true"  onclick="setTab('beds')">Beds</button>
+    <button role="tab" id="t-sow"  aria-selected="false" onclick="setTab('sow')">Sow now</button>
+    <button role="tab" id="t-fam"  aria-selected="false" onclick="setTab('fam')">Families</button>
+  </div>
+</header>
+<main><div id="view" class="spin">Loading…</div></main>
+<footer id="foot"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://psyshxhiyqzmqefvqgbr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_jL70goXc4bGiePqzI7R4rg_zhpc10Ly";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const FAMCLASS={"legumes":"fam-legumes","alliums":"fam-alliums","brassica":"fam-brassica","roots and fruits":"fam-roots","odds and ends":"fam-odds"};
+const FAMCOLOR={"legumes":"var(--legume)","alliums":"var(--allium)","brassica":"var(--brassica)","roots and fruits":"var(--roots)","odds and ends":"var(--odds)"};
+const FAMSING={"legumes":"legume","alliums":"allium","brassica":"brassica","roots and fruits":"roots and fruits"};
+const SECLABEL={N:"N",S:"S",E:"E",W:"W",whole:"ALL"};
+
+let state={tab:"beds", bedsMode:"grid", plots:[], plantings:[], calendar:[], features:[], openBed:null, err:null};
+const $=id=>document.getElementById(id);
+const bedNum=l=>parseInt(String(l).replace(/\D/g,""),10)||0;
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function fmtDate(d){ if(!d) return "no date"; const[y,m,day]=d.split("-"); return `${+day} ${MONTHS[+m-1].slice(0,3)} ${y.slice(2)}`; }
+
+async function load(){
+  try{
+    const [plots,plantings,cal,feat]=await Promise.all([
+      db.from("garden_plots").select("id,label,rotation_family,notes,map_x,map_y,map_w,map_h,split_axis"),
+      db.from("garden_plantings").select("id,plot_id,section,planted_on,status,garden_crop_types(name,family,nutrient_level)").eq("status","growing"),
+      db.from("garden_sowing_calendar").select("month,method,garden_crop_types(name,family)"),
+      db.from("garden_map_features").select("label,kind,map_x,map_y,map_w,map_h")
+    ]);
+    for(const r of [plots,plantings,cal]) if(r.error) throw r.error;
+    state.plots=plots.data.filter(p=>/^Bed /.test(p.label)).sort((a,b)=>bedNum(a.label)-bedNum(b.label));
+    state.plantings=plantings.data;
+    state.calendar=cal.data;
+    state.features=feat.error?[]:(feat.data||[]);
+  }catch(e){ state.err=e.message||String(e); }
+  render();
+}
+
+function setTab(t){ state.tab=t; state.openBed=null;
+  for(const k of ["beds","sow","fam"]) $("t-"+k).setAttribute("aria-selected",String(k===t));
+  render(); }
+function setMode(m){ state.bedsMode=m; render(); }
+
+/* jump from anywhere to a bed's detail */
+function goToBed(id){
+  state.tab="beds"; state.openBed=id;
+  for(const k of ["beds","sow","fam"]) $("t-"+k).setAttribute("aria-selected",String(k==="beds"));
+  render();
+  setTimeout(()=>document.getElementById("bedcard")?.scrollIntoView({behavior:"smooth",block:"center"}),40);
+}
+function openBed(id){ state.openBed=(state.openBed===id?null:id); render();
+  if(state.openBed) setTimeout(()=>document.getElementById("bedcard")?.scrollIntoView({behavior:"smooth",block:"nearest"}),30); }
+
+function plantingsFor(pid){
+  const o={N:0,S:1,E:2,W:3,whole:4};
+  return state.plantings.filter(p=>p.plot_id===pid)
+    .sort((a,b)=>(o[a.section]??9)-(o[b.section]??9)||(a.planted_on||"").localeCompare(b.planted_on||""));
+}
+function offFamily(r,fam){
+  const c=r.garden_crop_types||{};
+  if(!fam||fam==="odds and ends"||!c.family) return false;
+  return c.family!==FAMSING[fam];
+}
+
+function bedCard(){
+  if(!state.openBed) return `<div class="card"><div class="empty-note">Tap a bed to see what's growing in it.</div>
+    <div class="warn">Bed halves are signed on the beds themselves — N/S, or E/W on beds 13, 14 and 16.</div></div>`;
+  const p=state.plots.find(x=>x.id===state.openBed);
+  const rows=plantingsFor(p.id), fam=p.rotation_family;
+  const body=rows.length?rows.map(r=>{
+    const c=r.garden_crop_types||{}, off=offFamily(r,fam);
+    return `<div class="row"><span class="sec">${SECLABEL[r.section]||r.section}</span>
+      <span class="crop">${esc(c.name)}${off?` <small class="muted">· ${esc(c.family)}</small>`:""}
+      ${c.nutrient_level?`<span class="nut">${c.nutrient_level} nutrient need</span>`:""}</span>
+      <span class="when">${fmtDate(r.planted_on)}</span></div>`;
+  }).join(""):`<div class="empty-note">Nothing recorded as growing.</div>`;
+  const mism=rows.filter(r=>offFamily(r,fam)).length;
+  return `<div class="card" id="bedcard"><h2>${esc(p.label)}</h2>
+    <div class="sub">${fam?`<span class="pill" style="background:${FAMCOLOR[fam]}">${esc(fam)}</span>`:'<span class="muted">no rotation family recorded</span>'}
+      ${p.split_axis?` <span class="muted">· splits ${p.split_axis==="EW"?"east / west":"north / south"}</span>`:""}</div>
+    ${body}
+    ${mism?`<div class="warn">${mism} planting${mism>1?"s":""} outside this bed's rotation family — often a deliberate gap-filler, worth a look.</div>`:""}</div>`;
+}
+
+function viewGrid(){
+  return `<div class="grid">${state.plots.map(p=>{
+    const n=plantingsFor(p.id).length, cls=FAMCLASS[p.rotation_family]||"";
+    return `<button class="bed ${n?"":"empty"}" aria-pressed="${state.openBed===p.id}" onclick="openBed(${p.id})">
+      <b>${bedNum(p.label)}</b><span class="fam ${cls}"></span><span class="n">${n||"—"}</span></button>`;
+  }).join("")}</div>`;
+}
+
+function viewMap(){
+  const placed=state.plots.filter(p=>p.map_x&&p.map_y);
+  if(!placed.length){
+    return `<div class="card"><h2>Map not drawn yet</h2>
+      <div class="sub">No bed positions recorded.</div>
+      <p class="muted" style="font-size:14px;margin:0 0 10px">The map reads its layout from the database, so once the
+      positions are entered this view fills in without changing the app.</p>
+      <div class="warn">Send a sketch of the garden — bed numbers in their real positions, the main entrance,
+      and which way is north — and the layout can be entered from it.</div></div>` + viewGrid();
+  }
+  const maxX=Math.max(...placed.map(p=>p.map_x+(p.map_w||1)-1), ...state.features.map(f=>(f.map_x||0)+(f.map_w||1)-1), 1);
+  const cells=[];
+  for(const p of placed){
+    const rows=plantingsFor(p.id), fam=p.rotation_family;
+    const ns=(p.split_axis||"NS")==="NS";
+    const halves=ns?["N","S"]:["E","W"];
+    const inHalf=h=>rows.filter(r=>r.section===h||r.section==="whole")
+                       .map(r=>(r.garden_crop_types||{}).name).filter(Boolean);
+    const label=h=>{const c=inHalf(h); return c.length? esc(c.slice(0,2).join(", "))+(c.length>2?"…":"") : "—";};
+    cells.push(`<button class="mbed ${ns?"ns":""}" aria-pressed="${state.openBed===p.id}" onclick="openBed(${p.id})"
+      style="grid-column:${p.map_x} / span ${p.map_w||1};grid-row:${p.map_y} / span ${p.map_h||1}">
+      <span class="num">${bedNum(p.label)}</span>
+      <span class="fambar" style="background:${FAMCOLOR[fam]||"var(--line)"}"></span>
+      <span class="half">${label(halves[0])}</span><span class="half">${label(halves[1])}</span></button>`);
+  }
+  for(const f of state.features){
+    if(!f.map_x||!f.map_y) continue;
+    cells.push(`<div class="mfeat ${esc(f.kind)}" style="grid-column:${f.map_x} / span ${f.map_w||1};grid-row:${f.map_y} / span ${f.map_h||1}">${esc(f.label)}</div>`);
+  }
+  return `<div class="compass">↑ north</div>
+    <div class="mapwrap"><div class="map" style="grid-template-columns:repeat(${maxX},minmax(58px,1fr))">${cells.join("")}</div></div>`;
+}
+
+function viewBeds(){
+  const seg=`<div class="seg" role="tablist">
+    <button role="tab" aria-selected="${state.bedsMode==="grid"}" onclick="setMode('grid')">Grid</button>
+    <button role="tab" aria-selected="${state.bedsMode==="map"}"  onclick="setMode('map')">Map</button></div>`;
+  return seg + (state.bedsMode==="map"?viewMap():viewGrid()) + bedCard();
+}
+
+function viewSow(){
+  const m=new Date().getMonth()+1;
+  const rows=state.calendar.filter(r=>r.month===m);
+  const grp=meth=>rows.filter(r=>r.method===meth).map(r=>r.garden_crop_types?.name).filter(Boolean).sort();
+  const list=a=>a.length?`<ul class="crops">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<div class="empty-note">Nothing listed.</div>`;
+  const note=m===12?`<div class="warn">December's page wasn't in the photographed binder — this month is genuinely blank, not empty.</div>`:"";
+  return `<div class="cols">
+    <div class="card"><h2>Sow direct</h2><div class="sub">${MONTHS[m-1]} · straight into the bed</div>${list(grp("direct"))}</div>
+    <div class="card"><h2>Seed trays &amp; pots</h2><div class="sub">${MONTHS[m-1]} · raise then transplant</div>${list(grp("tray"))}${note}</div></div>`;
+}
+
+function viewFam(){
+  const fams=["legumes","alliums","brassica","roots and fruits","odds and ends"];
+  return `<div class="cols">${fams.map(f=>{
+    const beds=state.plots.filter(p=>p.rotation_family===f).sort((a,b)=>bedNum(a.label)-bedNum(b.label));
+    return `<div class="card"><h2><span class="pill" style="background:${FAMCOLOR[f]}">${esc(f)}</span></h2>
+      <div class="sub">${beds.length} bed${beds.length===1?"":"s"} · tap to open</div>
+      ${beds.length?`<ul class="crops">${beds.map(b=>
+        `<li class="tap" onclick="goToBed(${b.id})">Bed ${bedNum(b.label)}</li>`).join("")}</ul>`
+        :`<div class="empty-note">None.</div>`}</div>`;
+  }).join("")}
+  <div class="card"><div class="warn">Rotation family is recorded per bed from the binder page headers.
+  Nothing here suggests what to plant — it reports how the garden is currently organised.</div></div></div>`;
+}
+
+function render(){
+  const v=$("view");
+  if(state.err){ v.className="";
+    v.innerHTML=`<div class="card"><h2>Can't reach the garden data</h2><div class="sub">${esc(state.err)}</div>
+      <div class="warn">Supabase free-tier projects pause after about a week idle. If this persists, open the Supabase dashboard and restore the project.</div></div>`;
+    return; }
+  v.className="";
+  v.innerHTML = state.tab==="beds"?viewBeds() : state.tab==="sow"?viewSow() : viewFam();
+  const g=state.plantings.length, b=new Set(state.plantings.map(p=>p.plot_id)).size;
+  $("foot").textContent=`${g} plantings growing across ${b} beds · read-only`;
+}
+load();
+</script>
+</body>
+</html>
